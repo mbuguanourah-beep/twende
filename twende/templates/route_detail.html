@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ route.name }}{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <p class="muted"><a href="{{ url_for('routes') }}">Back to all routes</a></p>
+  <div class="led-board big" style="--route-color: {{ route.color }}"><span class="led-route">{{ route.name }}</span></div>
+  <p class="hero-sub">Nauli below is counted from the first stage. This route charges about KES {{ route.rate_per_km }} per km, with a minimum of KES {{ route.min_fare }}.</p>
+</section>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Stage</th>
+        <th scope="col">Km</th>
+        <th scope="col">Min</th>
+        {% for key, c in conditions.items() %}<th scope="col">{{ c.label }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in profile %}
+        <tr>
+          <th scope="row">{{ row.name }}</th>
+          {% if row.fares %}
+            <td>{{ row.km }}</td>
+            <td>{{ row.minutes }}</td>
+            {% for key in conditions %}<td>KES {{ row.fares[key] }}</td>{% endfor %}
+          {% else %}
+            <td colspan="{{ 2 + conditions|length }}" class="muted">Starting stage</td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<p class="actions"><a class="go inline" href="{{ url_for('report', route_id=route.id) }}">Report a nauli on this route</a></p>
+
+<h2 class="section-title">What riders paid</h2>
+{% if reports %}
+  <ul class="report-list">
+    {% for r in reports %}
+      <li>
+        <strong>KES {{ r.fare }}</strong> from {{ r.board }} to {{ r.alight }}
+        <span class="muted">({{ conditions[r.travel_condition].label }})</span>
+        {% if r.note %}<span class="note">{{ r.note }}</span>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="muted">No reports yet. Be the first to tell us what you paid.</p>
+{% endif %}
+{% endblock %}

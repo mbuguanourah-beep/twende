@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}Njia (routes){% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1 class="hero-title">Njia zote</h1>
+  <p class="hero-sub">Every matatu route in our sample network. Tap one to see the stages, the distance and the nauli from the first stage.</p>
+</section>
+
+<div class="route-grid">
+  {% for r in routes %}
+    <a class="route-card" href="{{ url_for('route_detail', route_id=r.id) }}" style="--route-color: {{ r.color }}">
+      <div class="led-board"><span class="led-route">{{ r.name }}</span></div>
+      <ul class="stop-chips">
+        {% for name in r.stop_names %}<li>{{ name }}</li>{% endfor %}
+      </ul>
+      <p class="muted">{{ r.stop_names|length }} stages, minimum nauli KES {{ r.min_fare }}</p>
+    </a>
+  {% endfor %}
+</div>
+{% endblock %}

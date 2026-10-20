@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block title %}Stage not found{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1 class="hero-title">Hii stage haipo</h1>
+  <p class="hero-sub">That page does not exist. The matatu went a different way.</p>
+  <p class="actions"><a class="go inline" href="{{ url_for('index') }}">Back to the stage</a></p>
+</section>
+{% endblock %}

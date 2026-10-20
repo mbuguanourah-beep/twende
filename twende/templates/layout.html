@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Twende{% endblock %} | Matatu route and fare finder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=DotGothic16&family=Permanent+Marker&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</head>
+<body>
+  <div class="flag-stripe" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('index') }}">
+      <span class="brand-name">Twende</span>
+      <span class="brand-tag">Find your matatu. Know your nauli.</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint == 'index' }}">Safiri</a>
+      <a href="{{ url_for('routes') }}" class="{{ 'active' if request.endpoint in ('routes', 'route_detail') }}">Njia</a>
+      <a href="{{ url_for('report') }}" class="{{ 'active' if request.endpoint == 'report' }}">Report nauli</a>
+    </nav>
+  </header>
+
+  <div class="led-ticker" aria-hidden="true">
+    <div class="led-track">
+      <span>KARIBU NAIROBI &nbsp;*&nbsp; TWENDE &nbsp;*&nbsp; NAULI SAFI &nbsp;*&nbsp; SAFIRI SALAMA &nbsp;*&nbsp; MATATU YAKO IKO NJIA &nbsp;*&nbsp;</span>
+      <span>KARIBU NAIROBI &nbsp;*&nbsp; TWENDE &nbsp;*&nbsp; NAULI SAFI &nbsp;*&nbsp; SAFIRI SALAMA &nbsp;*&nbsp; MATATU YAKO IKO NJIA &nbsp;*&nbsp;</span>
+    </div>
+  </div>
+
+  <main class="page">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flashes" role="status">
+          {% for category, message in messages %}
+            <p class="flash {{ category }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <p>Safiri salama. Routes, stages and fares here are sample estimates built for a class project, so always confirm the nauli with the konda before you pay.</p>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

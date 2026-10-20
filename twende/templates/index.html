@@ -1,0 +1,98 @@
+{% extends "layout.html" %}
+
+{% block title %}Plan your trip{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1 class="hero-title">Unaenda wapi?</h1>
+  <p class="hero-sub">Tell us where you are starting and where you are headed. We will find the matatus, the changes and the nauli.</p>
+</section>
+
+<form class="trip-form" method="get" action="{{ url_for('index') }}">
+  <div class="field">
+    <label for="origin">Panda from</label>
+    <input id="origin" name="origin" list="stop-list" value="{{ origin }}" placeholder="Try Ongata Rongai" autocomplete="off" required>
+  </div>
+
+  <button type="button" class="swap" id="swap" aria-label="Swap start and destination">&#8644;</button>
+
+  <div class="field">
+    <label for="destination">Shuka at</label>
+    <input id="destination" name="destination" list="stop-list" value="{{ destination }}" placeholder="Try Westlands" autocomplete="off" required>
+  </div>
+
+  <fieldset class="conditions">
+    <legend>Hali ya siku</legend>
+    {% for key, c in conditions.items() %}
+      <label class="chip">
+        <input type="radio" name="condition" value="{{ key }}" {% if key == condition %}checked{% endif %}>
+        <span>{{ c.label }}</span>
+      </label>
+    {% endfor %}
+  </fieldset>
+
+  <button class="go" type="submit">Twende!</button>
+
+  <datalist id="stop-list">
+    {% for s in stops %}<option value="{{ s.name }}"></option>{% endfor %}
+  </datalist>
+</form>
+
+{% if error %}
+  <p class="notice error" role="alert">{{ error }}</p>
+{% endif %}
+
+{% if journeys is not none %}
+  {% if journeys %}
+    <section class="results" aria-live="polite">
+      <h2 class="section-title">{{ origin }} to {{ destination }}</h2>
+      <p class="muted">{{ conditions[condition].label }} prices. {{ journeys|length }} way{{ 's' if journeys|length > 1 }} to go.</p>
+
+      {% for j in journeys %}
+        <article class="journey">
+          <header class="journey-head">
+            <div class="badges">
+              {% for b in j.badges %}<span class="badge">{{ b }}</span>{% endfor %}
+            </div>
+            <dl class="totals">
+              <div><dt>Nauli</dt><dd class="total-fare">KES {{ j.fare }}</dd></div>
+              <div><dt>Time</dt><dd>{{ j.minutes }} min</dd></div>
+              <div><dt>Changes</dt><dd>{{ j.transfers }}</dd></div>
+            </dl>
+          </header>
+
+          <ol class="legs">
+            {% for leg in j.legs %}
+              <li class="leg" style="--route-color: {{ leg.color }}">
+                <div class="led-board"><span class="led-route">{{ leg.route_name }}</span></div>
+                <p class="leg-line"><span class="verb">Panda</span>{{ leg.board }}</p>
+                {% if leg.via %}<p class="leg-via">Passing {{ leg.via|join(', ') }}</p>{% endif %}
+                <p class="leg-line"><span class="verb">Shuka</span>{{ leg.alight }}</p>
+                <p class="leg-meta">
+                  <span>KES {{ leg.fare }}</span>
+                  <span>{{ leg.minutes }} min</span>
+                  <span>{{ leg.km }} km</span>
+                  <span>{{ leg.stops }} stage{{ 's' if leg.stops > 1 }}</span>
+                </p>
+                {% if leg.community %}
+                  <p class="community">Riders say they paid about KES {{ leg.community.avg }} ({{ leg.community.n }} report{{ 's' if leg.community.n > 1 }}).</p>
+                {% endif %}
+              </li>
+              {% if not loop.last %}
+                <li class="change">Change matatu at {{ leg.alight }}. Expect about 8 minutes of waiting.</li>
+              {% endif %}
+            {% endfor %}
+          </ol>
+        </article>
+      {% endfor %}
+    </section>
+  {% else %}
+    <p class="notice">No matatu links these two stages in our sample data yet. Know one that does? <a href="{{ url_for('report') }}">Report a nauli</a> or check the <a href="{{ url_for('routes') }}">route list</a>.</p>
+  {% endif %}
+{% else %}
+  <aside class="konda">
+    <p class="konda-label">Konda says</p>
+    <p class="konda-tip">{{ tip }}</p>
+  </aside>
+{% endif %}
+{% endblock %}

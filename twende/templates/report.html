@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+
+{% block title %}Report nauli{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <h1 class="hero-title">Ulilipa ngapi?</h1>
+  <p class="hero-sub">Paid a different nauli than we predicted? Tell us. Your report shows up next to our estimate for the next rider.</p>
+</section>
+
+<form class="stack-form" method="post" action="{{ url_for('report') }}">
+  <div class="field">
+    <label for="route_id">Matatu route</label>
+    <select id="route_id" name="route_id" required>
+      {% for r in routes %}
+        <option value="{{ r.id }}" {% if r.id == selected_route %}selected{% endif %}>{{ r.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="two-col">
+    <div class="field">
+      <label for="board_id">Panda at</label>
+      <select id="board_id" name="board_id" required></select>
+    </div>
+    <div class="field">
+      <label for="alight_id">Shuka at</label>
+      <select id="alight_id" name="alight_id" required></select>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="field">
+      <label for="fare">Nauli you paid (KES)</label>
+      <input id="fare" name="fare" type="number" min="10" max="1000" step="5" inputmode="numeric" required>
+    </div>
+    <div class="field">
+      <label for="condition">Hali ya siku</label>
+      <select id="condition" name="condition">
+        {% for key, c in conditions.items() %}<option value="{{ key }}">{{ c.label }}</option>{% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="note">Note (optional)</label>
+    <input id="note" name="note" maxlength="140" placeholder="Konda asked for extra because of the jam">
+  </div>
+
+  <button class="go" type="submit">Send report</button>
+</form>
+
+<h2 class="section-title">Latest reports</h2>
+{% if recent %}
+  <ul class="report-list">
+    {% for r in recent %}
+      <li>
+        <strong>KES {{ r.fare }}</strong> on {{ r.route }}, {{ r.board }} to {{ r.alight }}
+        <span class="muted">({{ conditions[r.travel_condition].label }})</span>
+        {% if r.note %}<span class="note">{{ r.note }}</span>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="muted">Nothing yet. Your report could be the first one on the board.</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const ROUTES = {{ route_stops|tojson }};
+  const routeSel = document.getElementById('route_id');
+  const boardSel = document.getElementById('board_id');
+  const alightSel = document.getElementById('alight_id');
+
+  function fill(select, stops, selectedIndex) {
+    select.innerHTML = '';
+    stops.forEach((stop, idx) => {
+      const opt = document.createElement('option');
+      opt.value = stop.id;
+      opt.textContent = stop.name;
+      if (idx === selectedIndex) opt.selected = true;
+      select.appendChild(opt);
+    });
+  }
+
+  function refresh() {
+    const stops = ROUTES[routeSel.value] || [];
+    fill(boardSel, stops, 0);
+    fill(alightSel, stops, stops.length - 1);
+  }
+
+  routeSel.addEventListener('change', refresh);
+  refresh();
+</script>
+{% endblock %}
