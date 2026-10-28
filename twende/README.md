@@ -1,6 +1,5 @@
 # Twende: a matatu route and fare finder
 
-**Video demo:** (paste your video link here)
 
 Twende (Swahili for "let's go") helps a rider in Nairobi answer the two questions they ask before every trip: *which matatus do I take?* and *how much nauli will I pay?* You type where you are starting and where you are headed, and Twende finds the cheapest, the fastest and the fewest-changes way to get there, including where to change matatu. Riders can also report what they actually paid, and those reports appear next to the estimate for the next person.
 
